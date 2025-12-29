@@ -8,6 +8,7 @@ interface FeedbackOutputProps {
   feedback: string | null;
   isLoading: boolean;
   error: string | null;
+  jobRole: string;
 }
 
 const InitialState = () => (
@@ -21,7 +22,7 @@ const InitialState = () => (
 );
 
 
-export const FeedbackOutput: React.FC<FeedbackOutputProps> = ({ feedback, isLoading, error }) => {
+export const FeedbackOutput: React.FC<FeedbackOutputProps> = ({ feedback, isLoading, error, jobRole }) => {
   const renderContent = () => {
     if (isLoading) {
       return <div className="flex flex-col items-center justify-center h-full"><LoadingSpinner /><p className="mt-4 text-slate-400">Gemini is analyzing your resume...</p></div>;
@@ -30,16 +31,14 @@ export const FeedbackOutput: React.FC<FeedbackOutputProps> = ({ feedback, isLoad
       return <ErrorMessage message={error} />;
     }
     if (feedback) {
-      return <FormattedFeedback text={feedback} />;
+      return <FormattedFeedback text={feedback} jobRole={jobRole} />;
     }
     return <InitialState />;
   };
 
   return (
-    <div className="bg-slate-900 p-1 rounded-xl shadow-lg border border-slate-800 min-h-[500px] lg:min-h-0 h-full">
-        <div className="bg-slate-900/50 p-4 rounded-lg h-full">
-            {renderContent()}
-        </div>
+    <div className="bg-transparent min-h-[500px] lg:min-h-0 h-full">
+        {renderContent()}
     </div>
   );
 };

@@ -1,213 +1,87 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { CircularProgress } from './CircularProgress';
 
-// --- HELPER COMPONENTS ---
+// --- UI COMPONENTS ---
 
-const ScoreCard = ({ title, score, scoreClass }: { title: string, score: string, scoreClass: string }) => (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-center flex flex-col justify-center items-center">
-      <p className="text-slate-400 text-sm font-medium">{title}</p>
-      <p className={`text-4xl font-bold my-1 ${scoreClass}`}>{score}</p>
-    </div>
+const StrengthScoreCard: React.FC<{ score: number }> = ({ score }) => (
+  <div className="glass-card p-6 flex flex-col items-center justify-center text-center h-full">
+    <h3 className="font-semibold text-slate-300 mb-4">Resume Strength Score</h3>
+    <CircularProgress score={score} />
+  </div>
 );
 
-const FeedbackCard = ({ title, content }: { title: string; content: string }) => (
-    <div className="prose prose-sm max-w-none prose-slate prose-invert" dangerouslySetInnerHTML={{ __html: content }} />
+const AtsKeywordsCard: React.FC<{ friendliness: string; keywords: string[] }> = ({ friendliness, keywords }) => (
+  <div className="glass-card p-6 h-full">
+    <div className="flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 className="font-semibold text-slate-300">ATS Friendliness: {friendliness}</h3>
+    </div>
+    <div className="mt-4">
+      <h4 className="font-semibold text-slate-400 mb-2">Missing Keywords:</h4>
+      <div className="flex flex-col items-start gap-1">
+        {keywords.map((keyword, i) => (
+          <p key={i} className="text-red-400 font-mono text-lg tracking-tight">"{keyword}"</p>
+        ))}
+      </div>
+    </div>
+  </div>
 );
 
-const Pill: React.FC<{ text: string }> = ({ text }) => (
-  <span className="bg-blue-900/50 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full">{text}</span>
+const JobRoleCard: React.FC<{ role: string }> = ({ role }) => (
+  <div className="glass-card glow-border p-6 flex flex-col sm:flex-row items-center justify-center text-center gap-4">
+    <div className="flex items-center gap-3">
+        <div className="w-10 h-10 flex items-center justify-center bg-slate-700/50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.122-1.28-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.122-1.28.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+        <div className="w-10 h-10 flex items-center justify-center bg-slate-700/50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.122l2.454-2.454a1.5 1.5 0 012.122 0l1.414 1.414a1.5 1.5 0 002.122 0l4.242-4.242a1.5 1.5 0 012.122 0l2.455 2.455" /></svg></div>
+        <div className="w-10 h-10 flex items-center justify-center bg-slate-700/50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z M12 3.75a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 3.75z M7.5 12a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM12 15.75a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75-.75zM16.5 12a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75z" /></svg></div>
+    </div>
+    <div className="mt-2 sm:mt-0">
+        <p className="font-semibold text-slate-300">Job Role-Based Feedback</p>
+        <p className="text-sm text-slate-400">'{role}' Selected</p>
+    </div>
+  </div>
 );
 
-const sectionIcons: { [key: string]: React.ReactNode } = {
-  summary: <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />,
-  skills: <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.472-2.472a3.75 3.75 0 00-5.304-5.304L5.17 11.42M11.42 15.17l-2.472 2.472a3.75 3.75 0 01-5.304-5.304L11.42 5.17" />,
-  experience: <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125V6.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v.001c0 .621.504 1.125 1.125 1.125z" />,
-  projects: <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25" />,
-  education: <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0l-1.07-1.07a50.57 50.57 0 013.728-3.728L7.16 8.84a50.57 50.57 0 01-2.9 1.307" />,
-  default: <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />,
-};
-
-const SectionIcon: React.FC<{ title: string }> = ({ title }) => {
-  const normalizedTitle = title.toLowerCase();
-  let key = 'default';
-  if (normalizedTitle.includes('summary')) key = 'summary';
-  else if (normalizedTitle.includes('skills')) key = 'skills';
-  else if (normalizedTitle.includes('experience')) key = 'experience';
-  else if (normalizedTitle.includes('projects')) key = 'projects';
-  else if (normalizedTitle.includes('education')) key = 'education';
-  
-  return (
-    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            {sectionIcons[key]}
-        </svg>
-    </div>
-  );
-};
-
-const AccordionItem: React.FC<{ title: string; content: string }> = ({ title, content }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <div className={`bg-slate-800/40 rounded-lg mb-2 border border-slate-700/50 transition-all duration-300 ${isOpen ? 'bg-slate-800/80' : 'hover:bg-slate-800/60'}`}>
-      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center gap-4 p-4 text-left">
-        <SectionIcon title={title} />
-        <span className="flex-grow font-semibold text-slate-200">{title}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-      </button>
-      {isOpen && (
-        <div className="px-4 pb-4 pt-0">
-            <div className="border-t border-slate-700 pt-4">
-                 <div className="prose prose-sm max-w-none prose-slate prose-invert" dangerouslySetInnerHTML={{ __html: content }} />
-            </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-// --- PARSING LOGIC ---
-
-interface ParsedFeedback {
-  strengthScore: string;
-  atsScore: string;
-  improvedSummary: string;
-  skills: string[];
-  keywords: string[];
-  sections: { title: string; content: string }[];
-}
-
-const parseStructuredFeedback = (text: string): ParsedFeedback | null => {
-  try {
-    const scoreMatch = text.match(/\[START_SCORE\]([\s\S]*?)\[END_SCORE\]/);
-    const summaryMatch = text.match(/\[START_SUMMARY\]([\s\S]*?)\[END_SUMMARY\]/);
-    const skillsMatch = text.match(/\[START_SKILLS\]([\s\S]*?)\[END_SKILLS\]/);
-    const keywordsMatch = text.match(/\[START_KEYWORDS\]([\s\S]*?)\[END_KEYWORDS\]/);
-    const sectionsMatch = text.match(/\[START_SECTIONS\]([\s\S]*?)\[END_SECTIONS\]/);
-
-    if (!scoreMatch || !summaryMatch || !skillsMatch || !keywordsMatch || !sectionsMatch) {
-      console.warn("Response format incorrect, falling back.");
-      return null;
-    }
-
-    const scoreContent = scoreMatch[1];
-    const strengthScoreMatch = scoreContent.match(/Strength Score.*?(\d+(\.\d+)?\s*\/\s*10)/);
-    const atsScoreMatch = scoreContent.match(/ATS Compatibility Score.*?(\d+%?)/);
-
-    const skillsList = skillsMatch[1].split('\n').map(s => s.replace(/[-*]\s*/, '').trim()).filter(Boolean).slice(1);
-    const keywordsList = keywordsMatch[1].split(':')[1]?.split(',').map(k => k.trim()).filter(Boolean) ?? [];
-
-    const sectionsContent = sectionsMatch[1].split(/\*\s\*\*(.*?)\*\*/).filter(Boolean);
-    const sectionPairs = [];
-    for (let i = 0; i < sectionsContent.length; i += 2) {
-      if(sectionsContent[i] && sectionsContent[i+1]) {
-        sectionPairs.push({
-            title: sectionsContent[i].replace(':', '').trim(),
-            content: sectionsContent[i+1].replace(':', '').trim()
-        });
-      }
-    }
-    
-    return {
-      strengthScore: strengthScoreMatch ? strengthScoreMatch[1].replace(/\s/g, '') : 'N/A',
-      atsScore: atsScoreMatch ? atsScoreMatch[1].replace(/\s/g, '') : 'N/A',
-      improvedSummary: summaryMatch[1].split(/:\s*\n/).slice(1).join('\n').trim(),
-      skills: skillsList,
-      keywords: keywordsList,
-      sections: sectionPairs
-    };
-  } catch (error) {
-    console.error("Failed to parse AI feedback:", error);
-    return null; // Indicates parsing failure
-  }
-};
-
-const formatContent = (content: string): string => {
-    // 1. Handle bold text first
-    let html = content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
-
-    // 2. Process lines for paragraphs and lists
-    const lines = html.split('\n').filter(line => line.trim() !== '');
-    
-    let resultHtml = '';
-    let inList = false;
-
-    for (const line of lines) {
-        const trimmedLine = line.trim();
-        const isListItem = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
-        
-        if (isListItem) {
-            // If we are not in a list, start one
-            if (!inList) {
-                resultHtml += '<ul>';
-                inList = true;
-            }
-            // Add the list item, removing the bullet
-            resultHtml += `<li>${trimmedLine.substring(2)}</li>`;
-        } else {
-            // If we were in a list, close it
-            if (inList) {
-                resultHtml += '</ul>';
-                inList = false;
-            }
-            // Add the line as a paragraph
-            resultHtml += `<p>${line}</p>`;
-        }
-    }
-
-    // 3. Close any open list at the end
-    if (inList) {
-        resultHtml += '</ul>';
-    }
-
-    return resultHtml;
-};
-
-// --- MAIN COMPONENT ---
-
-export const FormattedFeedback: React.FC<{ text: string }> = ({ text }) => {
+const DetailedFeedbackTabs: React.FC<{ summary: string; suggestions: { title: string, content: string }[] }> = ({ summary, suggestions }) => {
   const [activeTab, setActiveTab] = useState('summary');
-  const feedback = useMemo(() => parseStructuredFeedback(text), [text]);
-
-  if (!feedback) {
-    // Render the raw text if parsing fails, ensuring user always sees the result.
-    return (
-        <div className="prose prose-sm max-w-none prose-slate prose-invert whitespace-pre-wrap">
-            <h3 className="font-semibold text-amber-400">Could not parse feedback structure</h3>
-            <p className="text-xs text-amber-500 mb-4">Displaying raw output from the AI:</p>
-            {text}
-        </div>
-    )
-  }
 
   const renderTabContent = () => {
-    switch (activeTab) {
-      case 'summary':
-        return <FeedbackCard title="Improved Professional Summary" content={formatContent(feedback.improvedSummary)} />;
-      case 'skills':
-        return (
-          <div>
-            <h4 className="font-semibold text-slate-200 mb-3">Skills to Add or Improve</h4>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {feedback.skills.map((skill, i) => <Pill key={i} text={skill} />)}
-            </div>
-            <h4 className="font-semibold text-slate-200 mb-3">ATS Keywords to Include</h4>
-            <div className="flex flex-wrap gap-2">
-              {feedback.keywords.map((keyword, i) => <Pill key={i} text={keyword} />)}
-            </div>
-          </div>
-        );
-      case 'analysis':
-        return (
-          <div>
-            {feedback.sections.map((sec, i) => (
-              <AccordionItem key={i} title={sec.title} content={formatContent(sec.content)} />
-            ))}
-          </div>
-        );
-      default:
-        return null;
+    if (activeTab === 'summary') {
+      return (
+        <div className="prose prose-sm max-w-none prose-slate prose-invert">
+          <p>{summary}</p>
+        </div>
+      );
     }
+    if (activeTab === 'suggestions') {
+      return (
+        <div className="space-y-4">
+          {suggestions.map((item, i) => {
+            const points = item.content
+              .split('\n')
+              .map(line => line.trim().replace(/^[-*]\s*/, ''))
+              .filter(line => line);
+
+            return (
+              <div key={i}>
+                <h4 className="font-semibold text-slate-200 mb-2">{item.title}</h4>
+                <ul className="space-y-1 list-none p-0">
+                  {points.map((point, j) => (
+                    <li key={j} className="flex items-start gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                      <span className="text-slate-300">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
   };
   
   const TabButton = ({ id, label }: { id: string, label: string }) => (
@@ -222,22 +96,103 @@ export const FormattedFeedback: React.FC<{ text: string }> = ({ text }) => {
   );
 
   return (
-    <div className="space-y-4 text-sm text-slate-300">
-      <div className="grid grid-cols-2 gap-4">
-        <ScoreCard title="Resume Strength" score={feedback.strengthScore} scoreClass="text-blue-400" />
-        <ScoreCard title="ATS Score" score={feedback.atsScore} scoreClass="text-green-400" />
+    <div className="glass-card p-4">
+      <div className="flex items-center gap-2 border-b border-slate-700 pb-2 mb-4">
+        <TabButton id="summary" label="Improved Summary" />
+        <TabButton id="suggestions" label="Detailed Suggestions" />
       </div>
-      
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-1">
-        <div className="flex items-center gap-2 p-2 border-b border-slate-700">
-            <TabButton id="summary" label="Improved Summary" />
-            <TabButton id="skills" label="Skills & Keywords" />
-            <TabButton id="analysis" label="Sectional Analysis" />
-        </div>
-        <div className="p-4 min-h-[200px]">
-            {renderTabContent()}
-        </div>
+      <div className="min-h-[200px] p-2">
+        {renderTabContent()}
       </div>
+    </div>
+  );
+};
+
+// --- PARSING LOGIC ---
+
+interface ParsedFeedback {
+  strengthScore: number;
+  atsFriendliness: string;
+  missingKeywords: string[];
+  improvedSummary: string;
+  detailedSuggestions: { title: string; content: string }[];
+}
+
+const parseStructuredFeedback = (text: string): ParsedFeedback | null => {
+  try {
+    const scoreMatch = text.match(/\[START_SCORE\]([\s\S]*?)\[END_SCORE\]/);
+    const keywordsMatch = text.match(/\[START_KEYWORDS\]([\s\S]*?)\[END_KEYWORDS\]/);
+    const summaryMatch = text.match(/\[START_IMPROVED_SUMMARY\]([\s\S]*?)\[END_IMPROVED_SUMMARY\]/);
+    const suggestionsMatch = text.match(/\[START_DETAILED_SUGGESTIONS\]([\s\S]*?)\[END_DETAILED_SUGGESTIONS\]/);
+    
+    if (!scoreMatch || !keywordsMatch || !summaryMatch || !suggestionsMatch) {
+        console.warn("Could not find all required sections in feedback.");
+        return null;
+    }
+
+    const scoreContent = scoreMatch[1];
+    const scoreLine = scoreContent.match(/Strength Score.*?(\d+(\.\d+)?)/);
+    const friendlinessLine = scoreContent.match(/ATS Friendliness.*?:\s*(\w+)/);
+    
+    const keywords = keywordsMatch[1].split(':')[1]?.split(',').map(k => k.trim()).filter(Boolean) ?? [];
+
+    const summaryContent = summaryMatch[1].split(/:\s*\n/).slice(1).join('\n').trim();
+
+    const suggestionsContent = suggestionsMatch[1].split(/\*\s\*\*(.*?)\*\*/).filter(Boolean);
+    const suggestions = [];
+    for (let i = 0; i < suggestionsContent.length; i += 2) {
+      if(suggestionsContent[i] && suggestionsContent[i+1]) {
+        suggestions.push({
+            title: suggestionsContent[i].replace(':', '').trim(),
+            content: suggestionsContent[i+1].trim()
+        });
+      }
+    }
+
+    return {
+      strengthScore: scoreLine ? parseFloat(scoreLine[1]) : 0,
+      atsFriendliness: friendlinessLine ? friendlinessLine[1] : 'N/A',
+      missingKeywords: keywords,
+      improvedSummary: summaryContent,
+      detailedSuggestions: suggestions
+    };
+  } catch (error) {
+    console.error("Failed to parse AI feedback:", error);
+    return null;
+  }
+};
+
+
+// --- MAIN COMPONENT ---
+
+export const FormattedFeedback: React.FC<{ text: string; jobRole: string }> = ({ text, jobRole }) => {
+  const feedback = useMemo(() => parseStructuredFeedback(text), [text]);
+
+  if (!feedback) {
+    return (
+        <div className="glass-card p-6 prose prose-sm max-w-none prose-slate prose-invert whitespace-pre-wrap">
+            <h3 className="font-semibold text-amber-400">Could not parse feedback structure</h3>
+            <p className="text-xs text-amber-500 mb-4">Displaying raw output from the AI:</p>
+            {text}
+        </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white animate-fade-in">
+        <style>{`.animate-fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }`}</style>
+        <div className="md:col-span-1">
+            <StrengthScoreCard score={feedback.strengthScore} />
+        </div>
+        <div className="md:col-span-1">
+            <AtsKeywordsCard friendliness={feedback.atsFriendliness} keywords={feedback.missingKeywords} />
+        </div>
+        <div className="md:col-span-2">
+            <JobRoleCard role={jobRole} />
+        </div>
+        <div className="md:col-span-2">
+            <DetailedFeedbackTabs summary={feedback.improvedSummary} suggestions={feedback.detailedSuggestions} />
+        </div>
     </div>
   );
 };

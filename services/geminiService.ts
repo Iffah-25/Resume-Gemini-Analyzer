@@ -22,30 +22,28 @@ Analyze the resume text provided below with the following context: ${roleContext
 Your feedback must be constructive, actionable, and tailored. Return the output STRICTLY in this format, using the exact headers and delimiters. Do not add any other commentary before or after the structured output.
 
 [START_SCORE]
-1. **Resume Strength Score**: (Provide a score out of 10. Example: 8/10).
-2. **ATS Compatibility Score**: (Provide a percentage score for ATS compatibility. Example: 95%).
+1. **Resume Strength Score**: (Provide a score out of 10. Example: 9.2/10).
+2. **ATS Friendliness**: (Provide a single-word rating: Excellent, Good, Fair, or Poor).
 [END_SCORE]
 
-[START_SUMMARY]
-3. **Improved Professional Summary**: (Rewrite the summary to be more impactful, 3-4 lines).
-[END_SUMMARY]
-
-[START_SKILLS]
-4. **Skills to Add or Improve**: (List key skills missing or needing emphasis. Use bullet points).
-[END_SKILLS]
-
 [START_KEYWORDS]
-5. **ATS Keywords to Include**: (Suggest specific, comma-separated keywords relevant to the job role that are missing).
+3. **Missing Keywords**: (Suggest 2-3 most critical, comma-separated keywords relevant to the role).
 [END_KEYWORDS]
 
-[START_SECTIONS]
-6. **Section-by-Section Suggestions**:
-    * **Summary**: (Critique and suggestions).
-    * **Skills**: (Critique and suggestions).
-    * **Experience**: (Critique and suggestions on bullet points, action verbs, and impact).
-    * **Projects**: (Critique and suggestions).
-    * **Education**: (Critique and suggestions).
-[END_SECTIONS]
+[START_IMPROVED_SUMMARY]
+4. **Improved Professional Summary**:
+(Rewrite the professional summary from the resume to be more impactful, concise, and tailored to the job role. If no summary exists, create one based on the resume content. Provide the summary as a single paragraph.)
+[END_IMPROVED_SUMMARY]
+
+[START_DETAILED_SUGGESTIONS]
+5. **Detailed Suggestions**:
+    * **Experience Section**:
+        - (Provide 2-3 specific, actionable bullet points on how to improve the experience section. Focus on quantifying achievements and using the STAR method.)
+    * **Skills Section**:
+        - (Provide 2-3 specific, actionable bullet points on how to improve the skills section. Suggest relevant skills to add or highlight.)
+    * **Formatting & Readability**:
+        - (Provide 2-3 specific, actionable bullet points on improving the overall resume format for better readability and ATS compatibility.)
+[END_DETAILED_SUGGESTIONS]
 
 Resume Text:
 ---

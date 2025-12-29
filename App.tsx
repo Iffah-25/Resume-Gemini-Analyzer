@@ -20,7 +20,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-slate-300 bg-[#0D1117]">
+    <div className="flex flex-col min-h-screen font-sans text-slate-300 bg-[#24242c]">
       <HeroSection 
         onGetStartedClick={handleScrollToAnalyzer} 
         onKeyFeaturesClick={handleScrollToFeatures} 
