@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Resume Improver",
+  "description": "An AI-powered tool that provides instant, privacy-first feedback on your resume using Google Gemini. Paste your resume text to get an ATS-friendly analysis, improvement suggestions, and a strength score without any data being stored.",
+  "requestFramePermissions": []
+}
